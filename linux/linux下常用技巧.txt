@@ -1,0 +1,137 @@
+linux下常用技巧
+
+SVN服务器搭建
+	http://blog.chinaunix.net/uid-29158166-id-3983118.html
+
+文件夹比较 diff -ruNa dir1 dir2 > dir12.diff
+
+删除目录下的的指定名字文件 
+	find dir -name "name" |xargs rm -rf
+	find dir -name "name" -exec rm -rf {} \;
+	
+mount smbfs 
+	sudo mount //192.168.10.20/share 20  -o username=shan,password=123456
+	
+svn
+	svnadmin dump newRepo -r 0:50 > dumpfile1
+	svnadmin load newRepo2 < dumpfile1
+	
+samba共享win7无法登陆访问
+	http://blog.csdn.net/adream307/article/details/24594721
+	http://www.wlshw.com/ziyuan/dn/106813.html
+
+clean kernel
+	make mrproper
+
+make -C kernel-3.18 O=/home/shan.han/project/MT6580M/out/target/product/esky6580_weg_c_m/obj/KERNEL_OBJ ARCH=arm CROSS_COMPILE=/home/shan.han/project/MT6580M/prebuilts/gcc/linux-x86/arm/arm-eabi-4.8/bin/arm-eabi- ROOTDIR=/home/shan.han/project/MT6580M  esky6580_weg_c_m_defconfig
+make -C kernel-3.18 O=/home/shan.han/project/MT6580M/out/target/product/esky6580_weg_c_m/obj/KERNEL_OBJ ARCH=arm CROSS_COMPILE=/home/shan.han/project/MT6580M/prebuilts/gcc/linux-x86/arm/arm-eabi-4.8/bin/arm-eabi- ROOTDIR=/home/shan.han/project/MT6580M 
+
+
+串口使能 			adb shell setprop persist.uartconsole.enable 1
+开机图片zip压缩 	zip -r -X -Z store ./bootanimation.3.zip part*/*.png desc.txt 
+
+
+
+修改DDR频率
+mediatek/proprietary/bootable/bootloader/preloader/platform/mt6580/src/drivers/pll.c
+	mt_mempll_init
+
+打开串口log
+	1.如何在user版本中使用串口(uart)
+	bootable/bootloader/lk/app/mt_boot/mt_boot.c
+	#ifdef USER_BUILD                
+			sprintf(cmdline,"%s%s",cmdline," printk.disable_uart=1");
+	#else
+			sprintf(cmdline,"%s%s",cmdline," printk.disable_uart=0 ddebug_query=\"file *mediatek* +p ; file *gpu* =_\"");
+	#endif
+	将上面的printk.disable_uart=1改成printk.disable_uart=0，然后重新编译lk, download lk 即可；或者直接download eng版本的lk。
+
+	2.如何开启Uart 的控制台(console/sh) 
+	system/core/rootdir/init.rc
+	service console /system/bin/sh
+		class core
+		console
+		disabled
+		user shell
+		seclabel u:r:shell:s0
+
+	on property:ro.debuggable=1
+		start console
+
+	注释掉on property:ro.debuggable=1，然后重新编译bootimage 即可。
+
+打开kernel串口log => adb shell setprop persist.uartconsole.enable 1
+
+
+dts
+	arch/arm/boot/dts/mt6580.dtsi
+	
+cp kernel-3.18/drivers/misc/mediatek/mach/mt6580/D02_6580_weg_c_m/dct/dct/codegen.dws  vendor/mediatek/proprietary/bootable/bootloader/lk/target/D02_6580_weg_c_m/dct/dct/codegen.dws
+cp kernel-3.18/drivers/misc/mediatek/mach/mt6580/D02_6580_weg_c_m/dct/dct/codegen.dws  vendor/mediatek/proprietary/bootable/bootloader/preloader/custom/D02_6580_weg_c_m/dct/dct/codegen.dws
+cp kernel-3.18/drivers/misc/mediatek/mach/mt6580/D02_6580_weg_c_m/dct/dct/codegen.dws  vendor/mediatek/proprietary/custom/D02_6580_weg_c_m/kernel/dct/dct/codegen.dws
+
+svn 回退命令
+svn merge -r640:632  mediatek/proprietary/custom/D02_6580_weg_c_m/kernel/dct/dct/codegen.dws
+svn merge -r640:632  mediatek/proprietary/bootable/bootloader/preloader/custom/D02_6580_weg_c_m/dct/dct/codegen.dws
+svn merge -r640:632  mediatek/proprietary/bootable/bootloader/lk/target/D02_6580_weg_c_m/dct/dct/codegen.dws
+
+充电调试 AC_CHARGER_CURRENT
+	drivers/misc/mediatek/include/mt-plat/mt6580/include/mach/mt_charging.h
+	http://www.cnblogs.com/reality-soul/articles/4786989.html
+修改充电图标
+	bootlogo.cpp
+	charging_animation.cpp
+	show_animation_common.c
+	show_animation_common.h
+关机电压
+	SYSTEM_OFF_VOLTAGE
+修改电池曲线表
+	mt_battery_meter_table.h 
+电池曲线
+	http://blog.csdn.net/u010245383/article/details/51006597
+
+http://blog.csdn.net/y_lang/article/details/46989801
+
+背光设置
+	/kernel-3.18/drivers/misc/mediatek/leds/leds_drv.c
+
+MTK分区配置
+	device/mediatek/build/build/tools/ptgen/MT6580/partition_table_MT6580.xls
+
+DVFS	
+	max_cpu_num初始化cpu的最大数目(_mt_cpufreq_init)  drivers\misc\mediatek\base\power\mt6580\mt_cpufreq.c
+打开设置
+	adb shell am start com.android.settings/.Settings
+MTK Logger使用ADB控制   http://www.fx114.net/qa-216-254244.aspx
+	启动log
+	adb shell am broadcast -a com.mediatek.mtklogger.ADB_CMD -e cmd_name start --ei cmd_target 1	 7可改为1/2/4，分别代表MobileLog/ModemLog/NetworkLog
+	关闭log
+	adb shell am broadcast -a com.mediatek.mtklogger.ADB_CMD -e cmd_name stop --ei cmd_target 1
+	
+	adb shell am broadcast -a com.mediatek.mtklogger.ADB_CMD -e cmd_name set_log_size_10240 --ei cmd_target 1
+
+	设置log路径为内置SD卡
+	adb shell setprop persist.mtklog.log2sd.path /mnt/sdcard
+
+	显示MTKLogger主界面
+	adb shell am start -n com.mediatek.mtklogger/com.mediatek.mtklogger.MainActivity
+
+	启动工程模式
+	adb shell am start com.mediatek.engineermode/.EngineerMode
+
+飞行模式打开 adb shell settings put global airplane_mode_on 1
+
+
+工程模式: *#3646633#
+测试模式: *#66*#
+
+. zproject/envsetup.sh
+
+
+AT+CWMODE=3
+AT+CWJAP="Lianyun","poiuytrewq"
+AT+CIFSR
+AT+CIPSTART="TCP","192.168.10.101",8000
+AT+CIPSEND=10
+
+

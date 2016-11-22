@@ -1,0 +1,65 @@
+﻿1. adb shell cat /proc/kmsg > D:\log.txt
+
+2. 获取framebuffer数据
+	adb remount //将设备改为可读可写
+	adb shell cat /dev/graphics/fb0 > /data/fb.bin
+	exit
+	adb pull /data/fb.bin D:\
+	RawView参数：分辨率256X256	ARGB格式
+	
+3. 抓取内核log(例：触摸屏log等)
+	adb shell cat proc/kmsg > D:\log.txt
+	
+4. 启动应用
+	adb shell am start -a android.intent.action.CALL tel:1112223333
+
+5. 去掉80手机原始的虚拟按键
+	adb shell
+	setprop qemu.hw.mainkeys 1
+	stop
+	start
+	
+6. input event事件坐标
+	adb shell getevent :查看name为"mtk-tpd"的event编号
+	adb shell getevent /dev/input/event3(mtk-tpd) :获取Input子系统上报的坐标
+
+7. 使用adb命令从手机拷贝数据
+    D:\android> adb pull /mnt/sdcard/mtklog/	将mtklog目录下的文件拷贝到当前路径(个人电脑路径)
+	
+8. 安装APK
+   adb install 路径...
+   
+9. 启动APK
+   adb shell am start lianyun.com.smartwatchii/.FullActivity
+   adb shell am start -n com.android.settings/com.android.settings.Settings
+   adb shell input text poiuytrewq
+   
+10. 重启手机
+   adb reboot
+
+11. 发送按键键值
+   adb shell input keyevent 4	//返回键   
+   
+12. 文件拷贝到device
+   adb push 原路径  目的路径
+   
+13. adb服务进程
+   adb kill-server 终止adb服务进程
+   adb start-server 重启adb服务进程
+   
+   
+14. kernel层颜色测试
+	cd /test
+	mm
+	
+	adb remount
+	adb push mtkfb_spi /system/bin
+	chmod 777 system/bin/mtkfb_spi
+	./mtkfb_spi
+	说明
+	1. red.h文件内有像素值，其中第一个参数0x0001表示SPI刷屏，0x0000表示GPIO刷屏，
+	      其它四个参数是像素值，目前给相同像素值调试
+    2. GPIO刷完后再切换成SPI刷屏，SPI恢复波形正常有点慢
+
+   
+
