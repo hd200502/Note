@@ -134,4 +134,7 @@ AT+CIFSR
 AT+CIPSTART="TCP","192.168.10.101",8000
 AT+CIPSEND=10
 
+Android 
+	/system/media/bootanimation.zip 压缩方式选择"存储"
+
 
