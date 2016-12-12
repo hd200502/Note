@@ -137,4 +137,17 @@ AT+CIPSEND=10
 Android 
 	/system/media/bootanimation.zip 压缩方式选择"存储"
 
+查看电池电量
+	adb shell cat /sys/class/power_supply/battery/capacity
+查看电池电压
+	adb shell cat /sys/class/power_supply/battery/BatterySenseVoltage
+	adb shell cat /sys/class/power_supply/battery/batt_vol
+查看电池温度
+	adb shell cat /sys/class/power_supply/battery/batt_temp
 
+调用系统setting
+	adb shell am start com.android.settings/.Settings
+	向光标位置输入 adb shell input text poiuytrewq
+
+MTK 差分升级包制作
+	./build/tools/releasetools/ota_from_target_files  -s ./device/mediatek/build/releasetools/mt_ota_from_target_files  -i V2_org.zip V4_new.zip   V2_4.zip
