@@ -149,5 +149,5 @@ Android
 	adb shell am start com.android.settings/.Settings
 	向光标位置输入 adb shell input text poiuytrewq
 
-MTK 差分升级包制作
+MTK 差分升级包制作  http://m.blog.chinaunix.net/uid-29728680-id-5723888.html
 	./build/tools/releasetools/ota_from_target_files  -s ./device/mediatek/build/releasetools/mt_ota_from_target_files  -i V2_org.zip V4_new.zip   V2_4.zip
