@@ -20,6 +20,14 @@ samba共享win7无法登陆访问
 	http://blog.csdn.net/adream307/article/details/24594721
 	http://www.wlshw.com/ziyuan/dn/106813.html
 
+
+svn: E200033: database is locked  之后无论是cleanup，还是release locker都没反应！
+	$ cd /your project path/.svn  
+	$ mv wc.db wc.db.old         #做事都要有备份的习惯  
+	$ sqlite3 wc.db.old          #打开copy的数据库  
+	sqlite> .backup main wc.db     
+	sqlite> .exit  
+
 clean kernel
 	make mrproper
 
@@ -151,3 +159,19 @@ Android
 
 MTK 差分升级包制作  http://m.blog.chinaunix.net/uid-29728680-id-5723888.html
 	./build/tools/releasetools/ota_from_target_files  -s ./device/mediatek/build/releasetools/mt_ota_from_target_files  -i V2_org.zip V4_new.zip   V2_4.zip
+
+Modem编译
+	./make.sh ESKY6580_WE_C_M_HSPA.mak new
+	../MT6580M/device/mediatek/build/build/tools/modemRenameCopy.pl . ESKY6580_WE_C_M_HSPA
+
+Power数据查看
+	adb shell dumpsys batterystats > battery.txt
+	python historian.py battery.txt > battery.html
+
+休眠的过程中被CCIF_MD唤醒的状况分析
+	http://blog.chinaunix.net/uid-21356596-id-4141346.html
+	1. CCIF_MD wakeup source: MD_NVRAM_RX(14,1) 
+	2. CCIF_MD wakeup source: Net_CCMNI1_RX(20,2) 
+	3. CCIF_MD wakeup source: Net_CCMNI1_RX(20,2)
+	第一个是因为存在少量的数据连接，当少量封包传输完毕的时候，系统会关闭连接进入休眠，这个时候，AP告诉modem要关闭连接，而modem操作的时候，需要写NVRAM，所以这个时候可以看到kernel log中有被NVRAM唤醒的状况。
+    后面两种也是因为打开了数据连接，此过程中，当少量封包传输完毕的时候，AP这边让modem关闭连接，当网络上面有数据的时候，又会申请建立连接而导致的唤醒系统的状况

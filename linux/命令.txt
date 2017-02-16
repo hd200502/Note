@@ -46,12 +46,11 @@
 13. adb服务进程
    adb kill-server 终止adb服务进程
    adb start-server 重启adb服务进程
-   
-   
+
 14. kernel层颜色测试
 	cd /test
 	mm
-	
+
 	adb remount
 	adb push mtkfb_spi /system/bin
 	chmod 777 system/bin/mtkfb_spi
@@ -61,5 +60,7 @@
 	      其它四个参数是像素值，目前给相同像素值调试
     2. GPIO刷完后再切换成SPI刷屏，SPI恢复波形正常有点慢
 
-   
-
+15.查找安装的app，例如查找demo这个app
+	adb shell "pm list package | grep demo"
+	adb uninstall com.amap.location.demo
+	
