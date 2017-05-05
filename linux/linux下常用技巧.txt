@@ -8,7 +8,20 @@ SVN服务器搭建
 删除目录下的的指定名字文件 
 	find dir -name "name" |xargs rm -rf
 	find dir -name "name" -exec rm -rf {} \;
+
+tar包分隔为2048MB大小的多个包
+	tar cf - test.0.2350.dump | split -b 2048MB - test.0.2350.dump.tar.   //生成test.0.2350.dump.tar.aa test.0.2350.dump.tar.ab
+	将分隔的包还原
+	cat test.0.2350.dump.tar.a* | tar x
 	
+	tar czf - test.0.2350.dump | split -b 2048MB - test.0.2350.dump.tar.gz.   //生成test.0.2350.dump.tar.gz.aa test.0.2350.dump.tar.gz.ab
+	将分隔的包还原
+	cat test.0.2350.dump.tar.gz.a* | tar xz
+	
+	tar cjf - test.0.2350.dump | split -b 2048MB - test.0.2350.dump.tar.bz.   //生成test.0.2350.dump.tar.bz.aa test.0.2350.dump.tar.bz.ab
+	将分隔的包还原
+	cat test.0.2350.dump.tar.bz.a* | tar xj
+
 mount smbfs 
 	sudo mount //192.168.10.20/share 20  -o username=shan,password=123456
 	
